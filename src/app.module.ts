@@ -5,6 +5,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 import { Logger } from '@nestjs/common';
 import { FlightsModule } from './flights/flights.module';
+import { UsersModule } from './users/users.module';
+import {
+  IsUniqueConstraint,
+  IsPhoneNumberConstraint,
+} from './validators/custom-validator';
 
 @Module({
   imports: [
@@ -27,9 +32,10 @@ import { FlightsModule } from './flights/flights.module';
       isGlobal: true,
     }),
     FlightsModule,
+    UsersModule,
   ],
   controllers: [AppController],
-  providers: [],
+  providers: [IsUniqueConstraint, IsPhoneNumberConstraint],
 })
 export class AppModule {
   private readonly logger: Logger = new Logger(AppModule.name);
