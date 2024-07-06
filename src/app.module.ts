@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 import { Logger } from '@nestjs/common';
+import { FlightsModule } from './flights/flights.module';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { Logger } from '@nestjs/common';
         username: configService.get<string>('DB_USENAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
-        entities: [],
+        autoLoadEntities: true,
         synchronize: true,
       }),
     }),
@@ -25,6 +26,7 @@ import { Logger } from '@nestjs/common';
       envFilePath: ['.env.development'],
       isGlobal: true,
     }),
+    FlightsModule,
   ],
   controllers: [AppController],
   providers: [],
