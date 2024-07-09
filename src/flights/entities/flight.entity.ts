@@ -18,7 +18,7 @@ export class Flight {
   @Column({ nullable: false })
   destination_code: string;
 
-  @Column({ nullable: true, length: 2 })
+  @Column({ type: 'enum', enum: AirLine, nullable: true })
   airline_code: AirLine;
 
   @Column({ type: 'datetime', nullable: false })

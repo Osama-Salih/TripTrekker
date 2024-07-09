@@ -9,8 +9,8 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import * as Amadeus from 'amadeus';
-
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const Amadeus = require('amadeus');
 import {
   FlightOfferType,
   FlightType,
@@ -21,7 +21,7 @@ import { Flight } from './entities/flight.entity';
 
 @Injectable()
 export class FlightsService {
-  private amadeus: Amadeus;
+  private amadeus;
 
   constructor(
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
