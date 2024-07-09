@@ -7,6 +7,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { RoleEnum } from '../../roles/role.enum';
+
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn({ type: 'bigint' })
@@ -40,8 +42,8 @@ export class User {
   @Column({ default: true })
   isActive: boolean;
 
-  @Column({ default: 'user' })
-  role: 'admin' | 'user';
+  @Column({ type: 'enum', enum: RoleEnum, default: RoleEnum.USER })
+  role: RoleEnum;
 
   @CreateDateColumn({
     type: 'timestamp',
