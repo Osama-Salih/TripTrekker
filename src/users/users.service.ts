@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
@@ -72,7 +76,13 @@ export class UsersService {
     id: number,
     data: PasswordToChange,
   ): Promise<string> {
-    await this.findOneByID(id);
+    const user = await this.findOneByID(id);
+
+    const isMatch = await bcrypt.compare(data.currentPassword, user.password);
+    if (!isMatch) {
+      throw new UnauthorizedException('Incorrect current password.');
+    }
+
     const hashedPassword = await bcrypt.hash(data.password, 12);
     await this.userRepo.update(id, {
       password: hashedPassword,

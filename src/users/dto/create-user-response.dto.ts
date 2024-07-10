@@ -26,6 +26,9 @@ export class ResponseCreateUserDTO {
   isActive: boolean;
 
   @Exclude()
+  passwordChangedAt: Date;
+
+  @Exclude()
   role: RoleEnum;
 
   createdAt: Date;
