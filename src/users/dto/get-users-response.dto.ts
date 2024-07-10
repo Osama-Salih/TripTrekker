@@ -20,6 +20,9 @@ export class ResponseGetUsersDTO {
   @Exclude()
   password: string;
 
+  @Exclude()
+  passwordChangedAt?: Date;
+
   @Expose()
   phone: string;
 

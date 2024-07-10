@@ -1,4 +1,10 @@
-import { ClassSerializerInterceptor, Module } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { AppController } from './app.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -8,11 +14,15 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 
 import { FlightsModule } from './flights/flights.module';
 import { UsersModule } from './users/users.module';
+import { AccountStatusMiddleware } from './middlewares/account-status-middleware';
+
 import {
   IsUniqueConstraint,
   IsPhoneNumberConstraint,
 } from './validators/custom-validator';
 import { AuthModule } from './auth/auth.module';
+import { AuthController } from './auth/auth.controller';
+import { UsersController } from './users/users.controller';
 
 @Module({
   imports: [
@@ -48,11 +58,21 @@ import { AuthModule } from './auth/auth.module';
     },
   ],
 })
-export class AppModule {
+export class AppModule implements NestModule {
   private readonly logger: Logger = new Logger(AppModule.name);
   constructor(private dataSource: DataSource) {
     this.logger.log(
       `DATABASE CONNECTED NAME ${this.dataSource.driver.database}⚡⚡⚡`,
     );
+  }
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AccountStatusMiddleware)
+      .exclude(
+        { path: 'users/reactive-me', method: RequestMethod.PATCH },
+        { path: 'auth/login', method: RequestMethod.POST },
+        { path: 'auth/signup', method: RequestMethod.POST },
+      )
+      .forRoutes(UsersController, AuthController);
   }
 }

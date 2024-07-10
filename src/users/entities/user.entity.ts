@@ -45,6 +45,9 @@ export class User {
   @Column({ type: 'enum', enum: RoleEnum, default: RoleEnum.USER })
   role: RoleEnum;
 
+  @Column({ type: 'timestamp', nullable: true })
+  passwordChangedAt?: Date;
+
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
