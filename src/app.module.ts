@@ -23,6 +23,7 @@ import {
 import { AuthModule } from './auth/auth.module';
 import { AuthController } from './auth/auth.controller';
 import { UsersController } from './users/users.controller';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { UsersController } from './users/users.controller';
     FlightsModule,
     UsersModule,
     AuthModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [
@@ -72,6 +74,9 @@ export class AppModule implements NestModule {
         { path: 'users/reactive-me', method: RequestMethod.PATCH },
         { path: 'auth/login', method: RequestMethod.POST },
         { path: 'auth/signup', method: RequestMethod.POST },
+        { path: 'auth/forgot_password', method: RequestMethod.POST },
+        { path: 'auth/verifiy-reset-code', method: RequestMethod.POST },
+        { path: 'auth/reset-password', method: RequestMethod.PATCH },
       )
       .forRoutes(UsersController, AuthController);
   }

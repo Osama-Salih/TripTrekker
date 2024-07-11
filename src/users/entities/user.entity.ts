@@ -48,6 +48,16 @@ export class User {
   @Column({ type: 'timestamp', nullable: true })
   passwordChangedAt?: Date;
 
+  @Column({ nullable: true })
+  passwordResetCode?: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  passwordResetExpire?: Date;
+
+  @Column({ nullable: true })
+  passwordResetVerify?: boolean;
+
+  @Column()
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',

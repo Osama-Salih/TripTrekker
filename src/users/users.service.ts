@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -11,6 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PasswordToChange } from './dto/change-password.dto';
+import { ResetPasswordDTO } from '../auth/dto/reset-password.dto';
 import { User } from './entities/user.entity';
 import { ResponseCreateUserDTO } from './dto/create-user-response.dto';
 import { ResponseGetUsersDTO } from './dto/get-users-response.dto';
@@ -72,6 +74,10 @@ export class UsersService {
     await this.userRepo.remove(user);
   }
 
+  async saveUser(user: User): Promise<void> {
+    await this.userRepo.save(user);
+  }
+
   async changeUserPassword(
     id: number,
     data: PasswordToChange,
@@ -126,5 +132,33 @@ export class UsersService {
   ): Promise<{ accessToken: string }> {
     await this.changeUserPassword(id, data);
     return { accessToken: this.jwtService.sign({ userId: id }) };
+  }
+
+  async findByResetCode(resetCode: string): Promise<User | null> {
+    return this.userRepo
+      .createQueryBuilder('user')
+      .where('user.passwordResetCode = :resetCode', { resetCode })
+      .andWhere('user.passwordResetExpire > :now', { now: new Date() })
+      .getOne();
+  }
+
+  async resetNewPassword(
+    resetPasswordDTO: ResetPasswordDTO,
+  ): Promise<{ accessToken: string } | BadRequestException> {
+    const user = await this.findOneByEmail(resetPasswordDTO);
+
+    if (user.passwordResetCode) {
+      user.password = await bcrypt.hash(resetPasswordDTO.password, 12);
+      user.passwordResetCode = null;
+      user.passwordResetExpire = null;
+      user.passwordResetVerify = null;
+
+      await this.userRepo.save(user);
+      return { accessToken: this.jwtService.sign({ userId: user.id }) };
+    } else {
+      throw new BadRequestException(
+        'Please initiate a forgot password request first',
+      );
+    }
   }
 }

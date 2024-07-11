@@ -23,6 +23,15 @@ export class ResponseGetUsersDTO {
   @Exclude()
   passwordChangedAt?: Date;
 
+  @Exclude()
+  passwordResetCode?: string;
+
+  @Exclude()
+  passwordResetExpire?: Date;
+
+  @Exclude()
+  passwordResetVerify?: boolean;
+
   @Expose()
   phone: string;
 

@@ -7,9 +7,15 @@ import { AuthController } from './auth.controller';
 import { UsersModule } from 'src/users/users.module';
 import { JwtStrategy } from './jwt.strategy';
 import jwtOptions from 'src/config/jwt-options';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
-  imports: [UsersModule, JwtModule.registerAsync(jwtOptions), PassportModule],
+  imports: [
+    UsersModule,
+    JwtModule.registerAsync(jwtOptions),
+    PassportModule,
+    MailModule,
+  ],
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
 })
