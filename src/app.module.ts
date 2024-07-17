@@ -25,6 +25,7 @@ import { AuthController } from './auth/auth.controller';
 import { UsersController } from './users/users.controller';
 import { MailModule } from './mail/mail.module';
 import { HotelsModule } from './hotels/hotels.module';
+import { ActivitiesModule } from './activities/activities.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { HotelsModule } from './hotels/hotels.module';
     AuthModule,
     MailModule,
     HotelsModule,
+    ActivitiesModule,
   ],
   controllers: [AppController],
   providers: [
