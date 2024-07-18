@@ -26,6 +26,7 @@ import { UsersController } from './users/users.controller';
 import { MailModule } from './mail/mail.module';
 import { HotelsModule } from './hotels/hotels.module';
 import { ActivitiesModule } from './activities/activities.module';
+import { BookingModule } from './booking/booking.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { ActivitiesModule } from './activities/activities.module';
     MailModule,
     HotelsModule,
     ActivitiesModule,
+    BookingModule.ForRoot(process.env.STRIPE_KEY, { apiVersion: '2024-06-20' }),
   ],
   controllers: [AppController],
   providers: [

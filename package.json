@@ -46,6 +46,7 @@
     "pug": "^3.0.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
+    "stripe": "^16.2.0",
     "typeorm": "^0.3.20"
   },
   "devDependencies": {
