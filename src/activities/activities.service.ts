@@ -75,10 +75,12 @@ export class ActivitiesService {
 
   private async saveActivity(activityData: ActivityType) {
     const newActivity = this.ActivityRepo.create({
+      activityId: activityData.id,
       name: activityData.name,
       description: activityData.description,
       location: JSON.stringify(activityData.geoCode),
-      price: activityData.price?.amount || '0.00',
+      price: +activityData.price?.amount || 0.0,
+      currency: activityData.price?.currencyCode,
       pictures: activityData.pictures,
     });
     await this.ActivityRepo.save(newActivity);

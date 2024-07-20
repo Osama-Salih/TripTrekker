@@ -11,6 +11,7 @@ import {
   ArrayNotEmpty,
   ArrayMaxSize,
   IsInt,
+  Length,
 } from 'class-validator';
 import { BoardType, Amenities } from '../../interfaces/hotels/hotels.enum';
 import { Type } from 'class-transformer';
@@ -27,6 +28,11 @@ export class GetHotelQueryDTO {
   @IsOptional()
   @IsDateString({}, { message: 'checkOut must be a valid date string' })
   readonly checkOut?: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @Length(3)
+  readonly currency: string;
 
   @IsOptional()
   @Min(1)

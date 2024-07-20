@@ -6,6 +6,9 @@ export class Activity {
   id: number;
 
   @Column({ nullable: false })
+  activityId: string;
+
+  @Column({ nullable: false })
   name: string;
 
   @Column({ type: 'text', nullable: false })
@@ -15,7 +18,10 @@ export class Activity {
   location: string;
 
   @Column({ type: 'decimal', nullable: false })
-  price: string;
+  price: number;
+
+  @Column({ type: 'varchar', length: 3, nullable: true, default: 'USD' })
+  currency: string;
 
   @Column({ type: 'simple-array', nullable: false })
   pictures: string[];

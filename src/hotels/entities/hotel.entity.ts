@@ -6,6 +6,12 @@ export class Hotel {
   id: number;
 
   @Column({ nullable: false })
+  hotelId: string;
+
+  @Column({ type: 'varchar', length: 3, nullable: false })
+  currency: string;
+
+  @Column({ nullable: false })
   name: string;
 
   @Column({ type: 'json', nullable: false })
@@ -21,5 +27,5 @@ export class Hotel {
   description: string;
 
   @Column({ type: 'decimal', nullable: false })
-  price: string;
+  price: number;
 }

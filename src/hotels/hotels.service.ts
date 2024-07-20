@@ -171,6 +171,7 @@ export class HotelsService {
       result: { data: hotelOffers },
     }: HotelOffersResponse = await this.amadeus.shopping.hotelOffersSearch.get({
       hotelIds: hotelId,
+      currency: options.currency,
       adults: options?.adults,
       checkInDate: options?.checkIn,
       checkOutDate: options?.checkOut,
@@ -190,12 +191,14 @@ export class HotelsService {
 
   private async saveHotel(hoteData: Partial<HotelOffers>): Promise<void> {
     const newHotel = this.hotelRepo.create({
+      hotelId: hoteData.hotel.hotelId,
       name: hoteData.hotel.name,
       location: hoteData.hotel.address,
       roomType: hoteData.offers[0].room.type,
       amenities: hoteData.hotel.amenities,
       description: hoteData.offers[0].description.text,
-      price: hoteData.offers[0].price.total,
+      currency: hoteData.offers[0].price.currency,
+      price: +hoteData.offers[0].price.total,
     });
     await this.hotelRepo.save(newHotel);
   }
