@@ -1,11 +1,3 @@
-export enum BoardType {
-  ROOM_ONLY = 'ROOM_ONLY',
-  BREAKFAST = 'BREAKFAST',
-  HALF_BOARD = 'HALF_BOARD',
-  FULL_BOARD = 'FULL_BOARD',
-  ALL_INCLUSIVE = 'ALL_INCLUSIVE',
-}
-
 export enum Amenities {
   SWIMMING_POOL = 'SWIMMING_POOL',
   SPA = 'SPA',

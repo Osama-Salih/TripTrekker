@@ -1,12 +1,4 @@
-import {
-  BadRequestException,
-  Controller,
-  Get,
-  InternalServerErrorException,
-  Param,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { HotelsService } from './hotels.service';
 
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -15,8 +7,8 @@ import { Roles } from '../roles/role.decorator';
 import { RoleEnum } from '../roles/role.enum';
 
 import { GetHotelQueryDTO } from './dto/get-hotel-query.dto';
-import { HotelType } from '../interfaces/hotels/hotels-api-all-hotles';
-import { HotelOffers } from '../interfaces/hotels/hotels-offers';
+import { HotelType } from './interfaces/all-hotles-interface';
+import { HotelOffers } from './interfaces/hotels-offers-interface';
 
 @Controller('hotels')
 export class HotelsController {
@@ -25,14 +17,12 @@ export class HotelsController {
   @Get('search')
   async hotelSearch(
     @Query() getHotelQueryDTO: GetHotelQueryDTO,
-  ): Promise<HotelType[] | InternalServerErrorException> {
+  ): Promise<HotelType[]> {
     return this.hotelsService.hotelSearch(getHotelQueryDTO);
   }
 
   @Get(':hotelId')
-  async hotelOffers(
-    @Param('hotelId') hotelId: string,
-  ): Promise<HotelOffers | BadRequestException | InternalServerErrorException> {
+  async hotelOffers(@Param('hotelId') hotelId: string): Promise<HotelOffers> {
     return this.hotelsService.getHotel(hotelId);
   }
 

@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Injectable,
   InternalServerErrorException,
   Inject,
@@ -10,20 +9,20 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Amadeus = require('amadeus');
 
-import { Amenities } from '../interfaces/hotels/hotels.enum';
-import { optionsType } from '../interfaces/hotels/hotels-options';
-import { HotelApiCityCode } from '../interfaces/hotels/hotels-api-city-code';
-import {
-  HotelType,
-  HotelsAllHotels,
-} from '../interfaces/hotels/hotels-api-all-hotles';
+import { Amenities } from './enums/amenities.enum';
+import { optionsType } from './interfaces/hotels-options-interface';
+import { HotelApiCityCode } from './interfaces/city-code-interface';
+
+import { HotelType, HotelsAllHotels } from './interfaces/all-hotles-interface';
+
 import {
   HotelOffersResponse,
   HotelOffers,
-} from '../interfaces/hotels/hotels-offers';
+} from './interfaces/hotels-offers-interface';
 
 import { GetHotelQueryDTO } from './dto/get-hotel-query.dto';
 import { Hotel } from './entities/hotel.entity';
@@ -40,9 +39,7 @@ export class HotelsService {
     this.amadeus = new Amadeus();
   }
 
-  async hotelSearch(
-    getHotelQueryDTO: GetHotelQueryDTO,
-  ): Promise<HotelType[] | InternalServerErrorException> {
+  async hotelSearch(getHotelQueryDTO: GetHotelQueryDTO): Promise<HotelType[]> {
     const { keyword, ratings, amenities } = getHotelQueryDTO;
 
     // Cache the options to use them in getHotelAndConfirm method
@@ -59,7 +56,6 @@ export class HotelsService {
 
     try {
       const cityCode = await this.getCityCodeFromKeyword(keyword);
-
       const hotels = await this.getAllHotels(
         cityCode,
         ratingsParam,
@@ -74,9 +70,7 @@ export class HotelsService {
     }
   }
 
-  async getHotel(
-    hotelId: string,
-  ): Promise<HotelOffers | BadRequestException | InternalServerErrorException> {
+  async getHotel(hotelId: string): Promise<HotelOffers> {
     const cachedHotelsData: HotelType[] = await this.getCachedHotelsData();
 
     // Find the hotle with the given hotelId
@@ -151,7 +145,7 @@ export class HotelsService {
       (hotel) => hotel.hotelId === hotelId,
     );
     if (!isValidHotel) {
-      throw new BadRequestException(
+      throw new NotFoundException(
         `Hotle with number (${hotelId}) not found, Please send a GET hotles/search request and chose the correct hotle number.`,
       );
     }
@@ -168,16 +162,26 @@ export class HotelsService {
     options: optionsType,
   ): Promise<string> {
     const {
+      currency,
+      adults,
+      checkIn,
+      checkOut,
+      roomQuantity,
+      boardType,
+      cheapestOffer,
+    } = options;
+
+    const {
       result: { data: hotelOffers },
     }: HotelOffersResponse = await this.amadeus.shopping.hotelOffersSearch.get({
+      currency,
+      adults,
+      roomQuantity,
+      boardType,
       hotelIds: hotelId,
-      currency: options.currency,
-      adults: options?.adults,
-      checkInDate: options?.checkIn,
-      checkOutDate: options?.checkOut,
-      roomQuantity: options?.roomQuantity,
-      boardType: options?.boardType,
-      bestRateOnly: options?.cheapestOffer,
+      checkInDate: checkIn,
+      checkOutDate: checkOut,
+      bestRateOnly: cheapestOffer,
     });
 
     // Send confirmation request to amadeus api.
@@ -185,7 +189,6 @@ export class HotelsService {
     if (!offerId) {
       throw new NotFoundException('No offer found for this hotel.');
     }
-
     return offerId;
   }
 

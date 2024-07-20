@@ -13,7 +13,8 @@ import {
   IsInt,
   Length,
 } from 'class-validator';
-import { BoardType, Amenities } from '../../interfaces/hotels/hotels.enum';
+import { BoardType } from '../enums/board-type.enum';
+import { Amenities } from '../enums/amenities.enum';
 import { Type } from 'class-transformer';
 
 export class GetHotelQueryDTO {
