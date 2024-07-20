@@ -1,8 +1,8 @@
 import {
   Injectable,
   Inject,
-  BadRequestException,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
@@ -11,11 +11,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Amadeus = require('amadeus');
-import {
-  FlightOfferType,
-  FlightType,
-  ApiResponse,
-} from '../interfaces/flights-interface';
+import { FlightOfferType, ApiResponse } from './interfaces/flights-interface';
+import { FlightType } from './interfaces/format-flight-interface';
 import { GetFlightQueryDTO } from './dto/get-flights-query.dto';
 import { Flight } from './entities/flight.entity';
 
@@ -33,7 +30,7 @@ export class FlightsService {
 
   async getFlights(
     getFlightQueryDTO: GetFlightQueryDTO,
-  ): Promise<FlightType[] | Error> {
+  ): Promise<FlightType[]> {
     try {
       const {
         origin_code,
@@ -69,7 +66,7 @@ export class FlightsService {
     }
   }
 
-  async getFlightAndConfirm(flightNumber: number): Promise<FlightType | Error> {
+  async getFlightAndConfirm(flightNumber: number): Promise<FlightType> {
     const cachedFlightsData: FlightOfferType[] =
       await this.cacheManager.get('cachedFlightsData');
 
@@ -79,7 +76,7 @@ export class FlightsService {
         flight.itineraries[0]?.segments[0]?.number === flightNumber.toString(),
     );
     if (!flight) {
-      throw new BadRequestException(
+      throw new NotFoundException(
         `Flight with number (${flightNumber}) not found, Please send a GET flights request and chose the correct flight number.`,
       );
     }
@@ -109,7 +106,7 @@ export class FlightsService {
     }
   }
 
-  private removeDuplicateFlights = (flights: FlightType[]): FlightType[] => {
+  private removeDuplicateFlights(flights: FlightType[]): FlightType[] {
     const uniqueFlightsMap = new Map();
 
     flights.forEach((flight) => {
@@ -120,9 +117,9 @@ export class FlightsService {
     });
 
     return Array.from(uniqueFlightsMap.values());
-  };
+  }
 
-  private formatFlightsData = (response: FlightOfferType[]): FlightType[] => {
+  private formatFlightsData(response: FlightOfferType[]): FlightType[] {
     // Extract and format flight data
     const extractFlightData = (flight: FlightOfferType) => {
       const segment = flight.itineraries?.[0]?.segments?.[0];
@@ -150,7 +147,7 @@ export class FlightsService {
 
     const extractedData = response.map((flight) => extractFlightData(flight));
     return extractedData;
-  };
+  }
 
   async saveFlight(flightData: FlightType): Promise<void> {
     const flight = this.flightRepo.create(flightData);

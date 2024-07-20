@@ -1,7 +1,8 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { TravelClass, AirLine } from '../../interfaces/flights-interface';
+import { TravelClass } from '../enums/travel-class.enum';
+import { AirLine } from '../enums/airline.enum';
 
-@Entity()
+@Entity('flights')
 export class Flight {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
@@ -9,7 +10,7 @@ export class Flight {
   @Column({ nullable: false })
   flight_number: string;
 
-  @Column()
+  @Column({ nullable: false })
   duration: string;
 
   @Column({ nullable: false })

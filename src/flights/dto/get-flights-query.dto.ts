@@ -8,7 +8,8 @@ import {
   IsEnum,
   IsBoolean,
 } from 'class-validator';
-import { TravelClass, AirLine } from '../../interfaces/flights-interface';
+import { TravelClass } from '../enums/travel-class.enum';
+import { AirLine } from '../enums/airline.enum';
 
 export class GetFlightQueryDTO {
   @IsNotEmpty()
