@@ -15,7 +15,7 @@ import {
   BookedService,
   BookedServiceType,
 } from './interface/booked-service-interface';
-import { CreateBookingDTO } from './dto/create-booking.dto';
+import { CheckoutSessionDTO } from './dto/checkout-sessioin.dto';
 
 @Injectable()
 export class BookingService {
@@ -35,7 +35,7 @@ export class BookingService {
     private readonly ActivityRepo: Repository<Activity>,
   ) {}
 
-  private async checkoutSession(
+  private async sessionHelper(
     req: Request,
     price: number,
     currency: string,
@@ -62,23 +62,12 @@ export class BookingService {
     });
   }
 
-  async createBooking(req: Request, createBookingDTO: CreateBookingDTO) {
-    const user = req.user as User;
-
+  async checkoutSession(req: Request, checkoutSessionDTO: CheckoutSessionDTO) {
     const { price, currency, cancelUrl } = await this.bookedServiceDetails(
-      createBookingDTO.bookedId,
+      checkoutSessionDTO.bookedId,
     );
 
-    const newBooking = this.bookingRepo.create({
-      flight: this.flight,
-      hotel: this.hotel,
-      activity: this.activity,
-      user,
-      bookingDate: new Date(),
-    });
-    await this.bookingRepo.save(newBooking);
-
-    const session = this.checkoutSession(req, price, currency, cancelUrl);
+    const session = this.sessionHelper(req, price, currency, cancelUrl);
     return session;
   }
 

@@ -7,19 +7,19 @@ import { RolesGuard } from '../roles/role.guard';
 import { Roles } from '../roles/role.decorator';
 import { RoleEnum } from '../roles/role.enum';
 
-import { CreateBookingDTO } from './dto/create-booking.dto';
+import { CheckoutSessionDTO } from './dto/checkout-sessioin.dto';
 
 @Controller('bookings')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class BookingController {
   constructor(private readonly bookingService: BookingService) {}
 
-  @Post()
+  @Post('checkout')
   @Roles(RoleEnum.USER)
-  async createBooking(
+  async checkoutSession(
     @Req() req: Request,
-    @Body() createBookingDTO: CreateBookingDTO,
+    @Body() checkoutSessionDTO: CheckoutSessionDTO,
   ) {
-    return this.bookingService.createBooking(req, createBookingDTO);
+    return this.bookingService.checkoutSession(req, checkoutSessionDTO);
   }
 }

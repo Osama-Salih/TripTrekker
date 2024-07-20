@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class CreateBookingDTO {
+export class CheckoutSessionDTO {
   @IsNotEmpty()
   @IsString()
   readonly bookedId: string;
