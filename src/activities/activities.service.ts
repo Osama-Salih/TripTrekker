@@ -8,10 +8,11 @@ const Amadeus = require('amadeus');
 
 import { GetActivityQueryDTO } from './dto/get-activity-query.dto';
 import { ResponseActivitySearchDTO } from './dto/activity-search-response.dto';
+
 import {
   Activities,
   ActivityType,
-} from '../interfaces/activities/get-activities.interface';
+} from './interfaces/get-activities.interface';
 import { Activity } from './entities/activity.entity';
 
 @Injectable()
@@ -26,8 +27,9 @@ export class ActivitiesService {
 
   async activitySearch(
     getActivityQueryDTO: GetActivityQueryDTO,
-  ): Promise<ResponseActivitySearchDTO[] | InternalServerErrorException> {
+  ): Promise<ResponseActivitySearchDTO[]> {
     const { latitude, longitude, radiusInKilometers } = getActivityQueryDTO;
+
     try {
       const {
         result: { data: activities },
@@ -45,9 +47,7 @@ export class ActivitiesService {
     }
   }
 
-  async getActivity(
-    activityId: string,
-  ): Promise<ResponseActivitySearchDTO | InternalServerErrorException> {
+  async getActivity(activityId: string): Promise<ResponseActivitySearchDTO> {
     try {
       const {
         result: { data: activity },
