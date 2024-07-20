@@ -1,22 +1,22 @@
 import {
-  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
+import { plainToClass } from 'class-transformer';
+import * as bcrypt from 'bcryptjs';
 
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { PasswordToChange } from './dto/change-password.dto';
-import { ResetPasswordDTO } from '../auth/dto/reset-password.dto';
-import { User } from './entities/user.entity';
+import { CreateUserDTO } from './dto/create-user.dto';
+import { UpdateUserDTO } from './dto/update-user.dto';
+import { PasswordToChangeDTO } from './dto/change-password.dto';
+
 import { ResponseCreateUserDTO } from './dto/create-user-response.dto';
 import { ResponseGetUsersDTO } from './dto/get-users-response.dto';
-import { plainToClass } from 'class-transformer';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -25,7 +25,7 @@ export class UsersService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async create(userDto: CreateUserDto): Promise<ResponseCreateUserDTO> {
+  async create(userDto: CreateUserDTO): Promise<ResponseCreateUserDTO> {
     const user = this.userRepo.create({
       ...userDto,
       password: await bcrypt.hash(userDto.password, 12),
@@ -54,16 +54,14 @@ export class UsersService {
     return new ResponseGetUsersDTO(user);
   }
 
-  async findOneByEmail(userData: Partial<User>): Promise<User> {
-    return this.userRepo.findOneBy({ email: userData.email });
-  }
+  async update(id: number, updateUserDTO: UpdateUserDTO): Promise<User> {
+    const { firstName, lastName, username, email } = updateUserDTO;
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     await this.userRepo.update(id, {
-      firstName: updateUserDto.firstName,
-      lastName: updateUserDto.lastName,
-      username: updateUserDto.username,
-      email: updateUserDto.email,
+      firstName,
+      lastName,
+      username,
+      email,
     });
 
     return this.findOneByID(id);
@@ -74,13 +72,9 @@ export class UsersService {
     await this.userRepo.remove(user);
   }
 
-  async saveUser(user: User): Promise<void> {
-    await this.userRepo.save(user);
-  }
-
   async changeUserPassword(
     id: number,
-    data: PasswordToChange,
+    data: PasswordToChangeDTO,
   ): Promise<string> {
     const user = await this.findOneByID(id);
 
@@ -95,70 +89,5 @@ export class UsersService {
       passwordChangedAt: new Date(),
     });
     return 'Password changed successfully.';
-  }
-
-  async updateLoggedUserDate(
-    id: number,
-    updateUserDto: UpdateUserDto,
-  ): Promise<User> {
-    await this.userRepo.update(id, {
-      firstName: updateUserDto.firstName,
-      lastName: updateUserDto.lastName,
-      username: updateUserDto.username,
-      email: updateUserDto.email,
-      phone: updateUserDto.phone,
-      gender: updateUserDto.gender,
-    });
-
-    return this.findOneByID(id);
-  }
-
-  async deactivateLoggedUser(id: number): Promise<void> {
-    await this.userRepo.update(id, {
-      isActive: false,
-    });
-  }
-  async reactivateLoggedUser(id: number): Promise<string> {
-    await this.userRepo.update(id, {
-      isActive: true,
-    });
-
-    return 'Account status active';
-  }
-
-  async updateLoggedUserPassword(
-    id: number,
-    data: PasswordToChange,
-  ): Promise<{ accessToken: string }> {
-    await this.changeUserPassword(id, data);
-    return { accessToken: this.jwtService.sign({ userId: id }) };
-  }
-
-  async findByResetCode(resetCode: string): Promise<User | null> {
-    return this.userRepo
-      .createQueryBuilder('user')
-      .where('user.passwordResetCode = :resetCode', { resetCode })
-      .andWhere('user.passwordResetExpire > :now', { now: new Date() })
-      .getOne();
-  }
-
-  async resetNewPassword(
-    resetPasswordDTO: ResetPasswordDTO,
-  ): Promise<{ accessToken: string } | BadRequestException> {
-    const user = await this.findOneByEmail(resetPasswordDTO);
-
-    if (user.passwordResetCode) {
-      user.password = await bcrypt.hash(resetPasswordDTO.password, 12);
-      user.passwordResetCode = null;
-      user.passwordResetExpire = null;
-      user.passwordResetVerify = null;
-
-      await this.userRepo.save(user);
-      return { accessToken: this.jwtService.sign({ userId: user.id }) };
-    } else {
-      throw new BadRequestException(
-        'Please initiate a forgot password request first',
-      );
-    }
   }
 }

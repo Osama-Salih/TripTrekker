@@ -15,12 +15,11 @@ import {
   Match,
 } from '../../validators/custom-validator';
 
-export class CreateUserDto {
+export class CreateUserDTO {
   @IsNotEmpty()
   @IsString()
   @IsAlpha()
   @Length(1, 200)
-  @IsUnique({ tableName: 'users', column: 'firstName' })
   readonly firstName: string;
 
   @IsNotEmpty()

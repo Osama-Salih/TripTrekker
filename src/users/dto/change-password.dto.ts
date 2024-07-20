@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsString, Length } from 'class-validator';
 import { Match } from 'src/validators/custom-validator';
 
-export class PasswordToChange {
+export class PasswordToChangeDTO {
   @IsNotEmpty()
   @IsString()
   @Length(6, 30, {

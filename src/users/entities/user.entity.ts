@@ -1,4 +1,3 @@
-import { Length } from 'class-validator';
 import {
   Entity,
   Column,
@@ -14,7 +13,7 @@ export class User {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
 
-  @Column({ nullable: false, length: 200, unique: true })
+  @Column({ nullable: false, length: 200 })
   firstName: string;
 
   @Column({ nullable: false, length: 200 })
@@ -27,10 +26,6 @@ export class User {
   email: string;
 
   @Column({ nullable: false })
-  @Length(6, 30, {
-    message:
-      'The password must be at least 6 but no longer then 30 characters.',
-  })
   password: string;
 
   @Column({ nullable: false })
@@ -57,7 +52,6 @@ export class User {
   @Column({ nullable: true })
   passwordResetVerify?: boolean;
 
-  @Column()
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
