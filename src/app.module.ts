@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 import { Logger } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
@@ -27,26 +27,15 @@ import { MailModule } from './mail/mail.module';
 import { HotelsModule } from './hotels/hotels.module';
 import { ActivitiesModule } from './activities/activities.module';
 import { BookingModule } from './booking/booking.module';
-
+import { dataSourceOptions } from './db/data-source';
+import configration from './config/configration';
 @Module({
   imports: [
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'mysql',
-        host: configService.get<string>('DB_HOST'),
-        port: configService.get<number>('DB_PORT'),
-        username: configService.get<string>('DB_USENAME'),
-        password: configService.get<string>('DB_PASSWORD'),
-        database: configService.get<string>('DB_DATABASE'),
-        autoLoadEntities: true,
-        synchronize: true,
-      }),
-    }),
+    TypeOrmModule.forRoot(dataSourceOptions),
     ConfigModule.forRoot({
-      envFilePath: ['.env.development'],
+      envFilePath: [`${process.cwd()}/.env.${process.env.NODE_ENV}`],
       isGlobal: true,
+      load: [configration],
     }),
     FlightsModule,
     UsersModule,
