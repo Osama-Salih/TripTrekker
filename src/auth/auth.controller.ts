@@ -2,10 +2,6 @@ import {
   Controller,
   Post,
   Body,
-  UnauthorizedException,
-  InternalServerErrorException,
-  NotFoundException,
-  BadRequestException,
   HttpCode,
   HttpStatus,
   Patch,
@@ -14,9 +10,10 @@ import {
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
 
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { CreateUserDTO } from 'src/users/dto/create-user.dto';
 import { LoginDTO } from './dto/login.dto';
 import { ForgotPasswordDTO } from './dto/forgot-password.dto';
+
 import { ResetCodeDTO } from './dto/verifiy-reset-code.dto';
 import { ResetPasswordDTO } from './dto/reset-password.dto';
 import { ResponseCreateUserDTO } from 'src/users/dto/create-user-response.dto';
@@ -29,15 +26,13 @@ export class AuthController {
   ) {}
   @Post('signup')
   async signup(
-    @Body() createUserDto: CreateUserDto,
+    @Body() createUserDTO: CreateUserDTO,
   ): Promise<ResponseCreateUserDTO> {
-    return this.userService.create(createUserDto);
+    return this.userService.create(createUserDTO);
   }
 
   @Post('login')
-  async login(
-    @Body() loginDTO: LoginDTO,
-  ): Promise<{ accessToken: string } | UnauthorizedException> {
+  async login(@Body() loginDTO: LoginDTO): Promise<{ accessToken: string }> {
     return this.authService.login(loginDTO);
   }
 
@@ -45,9 +40,7 @@ export class AuthController {
   @HttpCode(HttpStatus.ACCEPTED)
   async forgotPassword(
     @Body() forgotPasswordDTO: ForgotPasswordDTO,
-  ): Promise<
-    { message: string } | NotFoundException | InternalServerErrorException
-  > {
+  ): Promise<{ message: string }> {
     return this.authService.forgotPassword(forgotPasswordDTO);
   }
 
@@ -55,14 +48,14 @@ export class AuthController {
   @HttpCode(HttpStatus.ACCEPTED)
   async verifiyResetCode(
     @Body() resetCodeDTO: ResetCodeDTO,
-  ): Promise<{ message: string } | BadRequestException> {
+  ): Promise<{ message: string }> {
     return this.authService.verifiyResetCode(resetCodeDTO);
   }
 
   @Patch('reset-password')
   async resetPassword(
     @Body() resetPasswordDTO: ResetPasswordDTO,
-  ): Promise<{ accessToken: string } | BadRequestException> {
+  ): Promise<{ accessToken: string }> {
     return this.authService.resetPassword(resetPasswordDTO);
   }
 }

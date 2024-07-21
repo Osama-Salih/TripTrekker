@@ -6,29 +6,31 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 
 import { UsersService } from 'src/users/users.service';
+import { UserProfileService } from '../users/users-profile.service';
+import { User } from '../users/entities/user.entity';
+import { MailService } from 'src/mail/mail.service';
+
 import { LoginDTO } from './dto/login.dto';
 import { ForgotPasswordDTO } from './dto/forgot-password.dto';
 import { ResetCodeDTO } from './dto/verifiy-reset-code.dto';
 import { ResetPasswordDTO } from './dto/reset-password.dto';
 import { Payload } from '../interfaces/payload-interface';
-import { User } from '../users/entities/user.entity';
-import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UsersService,
+    private readonly userProfileService: UserProfileService,
     private readonly jwtService: JwtService,
     private mailService: MailService,
   ) {}
 
-  async login(
-    loginDTO: LoginDTO,
-  ): Promise<{ accessToken: string } | UnauthorizedException> {
+  async login(loginDTO: LoginDTO): Promise<{ accessToken: string }> {
     const user = await this.findOneByEmail(loginDTO);
 
     if (!user || !(await bcrypt.compare(loginDTO.password, user.password))) {
@@ -39,7 +41,7 @@ export class AuthService {
   }
 
   private async findOneByEmail(userData: Partial<LoginDTO>): Promise<User> {
-    return this.userService.findOneByEmail(userData);
+    return this.userProfileService.findOneByEmail(userData);
   }
 
   async findOneByID(id: number): Promise<User> {
@@ -48,9 +50,7 @@ export class AuthService {
 
   async forgotPassword(
     forgotPasswordDTO: ForgotPasswordDTO,
-  ): Promise<
-    { message: string } | NotFoundException | InternalServerErrorException
-  > {
+  ): Promise<{ message: string }> {
     const user = await this.findOneByEmail(forgotPasswordDTO);
 
     if (!user) {
@@ -69,14 +69,14 @@ export class AuthService {
     user.passwordResetExpire = new Date(Date.now() + 10 * 60 * 1000);
     user.passwordResetVerify = false;
 
-    await this.userService.saveUser(user);
+    await this.userProfileService.saveUser(user);
     try {
       await this.mailService.sendPasswordRest(user, resetCode);
     } catch (error) {
       user.passwordResetCode = null;
       user.passwordResetExpire = null;
       user.passwordResetVerify = null;
-      await this.userService.saveUser(user);
+      await this.userProfileService.saveUser(user);
 
       throw new InternalServerErrorException(
         'Technical difficulties. Try again later.',
@@ -87,27 +87,27 @@ export class AuthService {
 
   async verifiyResetCode(
     resetCodeDTO: ResetCodeDTO,
-  ): Promise<{ message: string } | BadRequestException> {
+  ): Promise<{ message: string }> {
     const resetCode = crypto
       .createHash('sha256')
       .update(resetCodeDTO.resetCode)
       .digest('hex');
 
-    const user = await this.userService.findByResetCode(resetCode);
+    const user = await this.userProfileService.findByResetCode(resetCode);
 
     if (!user) {
       throw new BadRequestException('Invalid reset code or expired.');
     }
 
     user.passwordResetVerify = true;
-    await this.userService.saveUser(user);
+    await this.userProfileService.saveUser(user);
 
     return { message: 'accepted' };
   }
 
   async resetPassword(
     resetPasswordDTO: ResetPasswordDTO,
-  ): Promise<{ accessToken: string } | BadRequestException> {
-    return this.userService.resetNewPassword(resetPasswordDTO);
+  ): Promise<{ accessToken: string }> {
+    return this.userProfileService.resetNewPassword(resetPasswordDTO);
   }
 }
