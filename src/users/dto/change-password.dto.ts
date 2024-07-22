@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString, Length } from 'class-validator';
-import { Match } from 'src/validators/custom-validator';
+import { Match } from '../../validators/match-validator';
 
 export class PasswordToChangeDTO {
   @IsNotEmpty()

@@ -9,11 +9,9 @@ import {
   IsIn,
 } from 'class-validator';
 
-import {
-  IsUnique,
-  IsPhoneNumber,
-  Match,
-} from '../../validators/custom-validator';
+import { IsUnique } from '../../validators/unique-validator';
+import { IsPhoneNumber } from '../../validators/phone-validator';
+import { Match } from '../../validators/match-validator';
 
 export class CreateUserDTO {
   @IsNotEmpty()

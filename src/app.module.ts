@@ -16,10 +16,8 @@ import { FlightsModule } from './flights/flights.module';
 import { UsersModule } from './users/users.module';
 import { AccountStatusMiddleware } from './middlewares/account-status-middleware';
 
-import {
-  IsUniqueConstraint,
-  IsPhoneNumberConstraint,
-} from './validators/custom-validator';
+import { IsPhoneNumberConstraint } from './validators/phone-validator';
+import { IsUniqueConstraint } from './validators/unique-validator';
 import { AuthModule } from './auth/auth.module';
 import { AuthController } from './auth/auth.controller';
 import { UsersController } from './users/users.controller';
