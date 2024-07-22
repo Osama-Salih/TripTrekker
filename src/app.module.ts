@@ -26,7 +26,9 @@ import { HotelsModule } from './hotels/hotels.module';
 import { ActivitiesModule } from './activities/activities.module';
 import { BookingModule } from './booking/booking.module';
 import { dataSourceOptions } from './db/data-source';
+import { validate } from './validators/environment';
 import configration from './config/configration';
+
 @Module({
   imports: [
     TypeOrmModule.forRoot(dataSourceOptions),
@@ -34,6 +36,7 @@ import configration from './config/configration';
       envFilePath: [`${process.cwd()}/.env.${process.env.NODE_ENV}`],
       isGlobal: true,
       load: [configration],
+      validate: validate,
     }),
     FlightsModule,
     UsersModule,
