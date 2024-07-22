@@ -4,8 +4,24 @@ import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { useContainer } from 'class-validator';
 
+import helmet from 'helmet';
+import compression from 'compression';
+import { rateLimit } from 'express-rate-limit';
+import { xss } from 'express-xss-sanitizer';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 100,
+  });
+
+  app.use('/api', limiter);
+  app.use(helmet()).use(compression()).use(xss());
+  app.enableCors({ origin: '*' });
+  app.setGlobalPrefix('api/v1');
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
