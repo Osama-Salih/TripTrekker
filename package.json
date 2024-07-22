@@ -11,7 +11,7 @@
     "start": "nest start",
     "start:dev": "SET NODE_ENV=development& nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "SET NODE_ENV=production& node dist/main",
+    "start:prod": "SET NODE_ENV=production npm install --omit=dev && npm run build && npm run start",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -36,7 +36,6 @@
     "@nestjs/typeorm": "^10.0.2",
     "@types/bcryptjs": "^2.4.6",
     "amadeus": "^10.1.0",
-    "axios": "^1.7.2",
     "bcryptjs": "^2.4.3",
     "cache-manager": "^5.6.1",
     "class-transformer": "^0.5.1",
@@ -55,14 +54,13 @@
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "stripe": "^16.2.0",
-    "typeorm": "^0.3.20",
-    "un": "^0.0.0"
+    "typeorm": "^0.3.20"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",
-    "@swc/cli": "^0.3.14",
+    "@swc/cli": "^0.4.0",
     "@swc/core": "^1.7.0",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.2",
