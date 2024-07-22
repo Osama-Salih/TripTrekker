@@ -25,13 +25,13 @@ import { MailModule } from './mail/mail.module';
 import { HotelsModule } from './hotels/hotels.module';
 import { ActivitiesModule } from './activities/activities.module';
 import { BookingModule } from './booking/booking.module';
-import { dataSourceOptions } from './db/data-source';
+import { typeOrmAsyncConfig } from './db/data-source';
 import { validate } from './validators/environment';
 import configration from './config/configration';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot(dataSourceOptions),
+    TypeOrmModule.forRootAsync(typeOrmAsyncConfig),
     ConfigModule.forRoot({
       envFilePath: [`${process.cwd()}/.env.${process.env.NODE_ENV}`],
       isGlobal: true,
