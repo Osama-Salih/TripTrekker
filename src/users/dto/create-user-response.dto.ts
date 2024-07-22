@@ -18,6 +18,15 @@ export class ResponseCreateUserDTO {
   @Exclude()
   password: string;
 
+  @Exclude()
+  passwordResetCode: string;
+
+  @Exclude()
+  passwordResetExpire: Date;
+
+  @Exclude()
+  passwordResetVerify: boolean;
+
   phone: string;
 
   gender: string;
