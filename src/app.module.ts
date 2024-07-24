@@ -11,6 +11,7 @@ import { ConfigModule } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 import { Logger } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { CacheModule } from '@nestjs/cache-manager';
 
 import { FlightsModule } from './flights/flights.module';
 import { UsersModule } from './users/users.module';
@@ -28,9 +29,11 @@ import { BookingModule } from './booking/booking.module';
 import { typeOrmAsyncConfig } from './db/data-source';
 import { validate } from './validators/environment';
 import configration from './config/configration';
+import redisOptions from './config/redis-options';
 
 @Module({
   imports: [
+    CacheModule.registerAsync(redisOptions),
     TypeOrmModule.forRootAsync(typeOrmAsyncConfig),
     ConfigModule.forRoot({
       envFilePath: [`${process.cwd()}/.env.${process.env.NODE_ENV}`],

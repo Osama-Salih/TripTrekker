@@ -58,8 +58,7 @@ export class FlightsService {
         });
 
       const flights = this.formatFlightsData(data);
-      await this.cacheManager.set('cachedFlightsData', data, 3600000); // ttl cache for one hour
-
+      await this.cacheManager.set('cachedFlightsData', data);
       return this.removeDuplicateFlights(flights);
     } catch (error) {
       throw new InternalServerErrorException('Failed to fetch flights');

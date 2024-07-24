@@ -43,11 +43,7 @@ export class HotelsService {
     const { keyword, ratings, amenities } = getHotelQueryDTO;
 
     // Cache the options to use them in getHotelAndConfirm method
-    await this.cacheManager.set(
-      'hotelSearchOptions',
-      getHotelQueryDTO,
-      3600000,
-    ); // ttl cache for one hour
+    await this.cacheManager.set('hotelSearchOptions', getHotelQueryDTO);
 
     // Convert ratings and amenities arrays to comma-separated string
     const ratingsParam = ratings?.length > 1 ? ratings.join(',') : ratings;
@@ -63,7 +59,7 @@ export class HotelsService {
       );
 
       // Cache hotles data to use it in getHotelAndConfirm method
-      await this.cacheManager.set('hotelsData', hotels, 3600000); // ttl cache for one hour
+      await this.cacheManager.set('hotelsData', hotels);
       return hotels;
     } catch (error) {
       throw new InternalServerErrorException('Failed to fetch hotles');
