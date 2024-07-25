@@ -88,6 +88,10 @@ export class EnvironmentVariables {
   @IsNotEmpty()
   @IsString()
   readonly STRIPE_KEY: string;
+
+  @IsNotEmpty()
+  @IsString()
+  readonly REDIS_STORE_URL: string;
 }
 
 export function validate(config: Record<string, unknown>) {

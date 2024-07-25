@@ -17,4 +17,5 @@ export default () => ({
   MAIL_PASSWORD: process.env.MAIL_PASSWORD,
   MAIL_FROM: process.env.MAIL_FROM,
   STRIPE_KEY: process.env.STRIPE_KEY,
+  REDIS_STORE_URL: process.env.REDIS_STORE_URL,
 });
