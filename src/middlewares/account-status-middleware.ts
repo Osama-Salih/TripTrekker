@@ -24,7 +24,7 @@ export class AccountStatusMiddleware implements NestMiddleware {
     if (req.url === '/reactive-me') next();
 
     const authHeader = req.headers.authorization;
-    if (!authHeader && !authHeader.startsWith('Bearer')) {
+    if (!authHeader || !authHeader.startsWith('Bearer')) {
       throw new UnauthorizedException('No authorization token found');
     }
     const token = authHeader.split(' ')[1];
