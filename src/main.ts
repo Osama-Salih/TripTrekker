@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { useContainer } from 'class-validator';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 import helmet from 'helmet';
 import compression from 'compression';
@@ -10,13 +11,14 @@ import { rateLimit } from 'express-rate-limit';
 import { xss } from 'express-xss-sanitizer';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     limit: 100,
   });
 
+  app.set('trust proxy', true);
   app.use('/api', limiter);
   app.use(helmet()).use(compression()).use(xss());
   app.enableCors({ origin: '*' });
