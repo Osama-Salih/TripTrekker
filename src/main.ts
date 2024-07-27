@@ -18,7 +18,7 @@ async function bootstrap() {
     limit: 100,
   });
 
-  app.set('trust proxy', true);
+  app.set('trust proxy', 1);
   app.use('/api', limiter);
   app.use(helmet()).use(compression()).use(xss());
   app.enableCors({ origin: '*' });
