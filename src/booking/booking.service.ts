@@ -3,6 +3,7 @@ import {
   Inject,
   NotFoundException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
@@ -31,6 +32,7 @@ export class BookingService {
   private hotel: Hotel;
   private activity: Activity;
   private configService: ConfigService;
+  private logger: Logger = new Logger(BookingService.name);
 
   constructor(
     @Inject(STRIPE_CLIENT) private readonly stripe: Stripe,
@@ -158,11 +160,11 @@ export class BookingService {
 
     let event;
 
-    console.log(
+    this.logger.log('Reading using process....', process.env.WEBHOOK_SECRET);
+    this.logger.log(
       'Reading using configService....',
       this.configService.get<string>('WEBHOOK_SECRET'),
     );
-    console.log('Reading using process....', process.env.WEBHOOK_SECRET);
     try {
       event = this.stripe.webhooks.constructEvent(
         req.body,
