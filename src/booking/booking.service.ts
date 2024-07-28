@@ -31,7 +31,6 @@ export class BookingService {
   private flight: Flight;
   private hotel: Hotel;
   private activity: Activity;
-  private configService: ConfigService;
   private logger: Logger = new Logger(BookingService.name);
 
   constructor(
@@ -44,6 +43,7 @@ export class BookingService {
     private readonly hotelRepo: Repository<Hotel>,
     @InjectRepository(Activity)
     private readonly ActivityRepo: Repository<Activity>,
+    private configService: ConfigService,
   ) {}
 
   private async sessionHelper(
