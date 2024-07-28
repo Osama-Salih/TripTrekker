@@ -23,7 +23,7 @@ export class BookingModule {
       imports: [TypeOrmModule.forFeature([Booking, Flight, Hotel, Activity])],
       providers: [stripeProviders, BookingService],
       controllers: [BookingController],
-      exports: [stripeProviders],
+      exports: [stripeProviders, BookingService],
       global: true,
     };
   }
