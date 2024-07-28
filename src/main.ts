@@ -11,7 +11,9 @@ import { rateLimit } from 'express-rate-limit';
 import { xss } from 'express-xss-sanitizer';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    rawBody: true,
+  });
 
   const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,

@@ -1,5 +1,12 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ConfigService } from '@nestjs/config';
+
 import { Repository } from 'typeorm';
 import { Request } from 'express';
 import Stripe from 'stripe';
@@ -16,12 +23,14 @@ import {
   BookedServiceType,
 } from './interface/booked-service-interface';
 import { CheckoutSessionDTO } from './dto/checkout-sessioin.dto';
+// import { findOneByEmail } from '../users/users-profile.service';
 
 @Injectable()
 export class BookingService {
   private flight: Flight;
   private hotel: Hotel;
   private activity: Activity;
+  private configService: ConfigService;
 
   constructor(
     @Inject(STRIPE_CLIENT) private readonly stripe: Stripe,
@@ -129,5 +138,42 @@ export class BookingService {
     }
 
     return { currency, price, cancelUrl };
+  }
+
+  // async createBooking(session) {
+  //   const user = await findOneByEmail(session.customer_email);
+
+  //   const newBooking = this.bookingRepo.create({
+  //     flight: this.flight,
+  //     hotel: this.hotel,
+  //     activity: this.activity,
+  //     user,
+  //     bookingDate: new Date(),
+  //   });
+  //   //   await this.bookingRepo.save(newBooking);
+  // }
+
+  async checkout(req: Request) {
+    const sig = req.headers['stripe-signature'];
+
+    let event;
+
+    try {
+      event = this.stripe.webhooks.constructEvent(
+        req.body,
+        sig,
+        this.configService.get<string>('WEBHOOK_SECRET'),
+      );
+    } catch (err) {
+      throw new BadRequestException(`Webhook Error: ${err.message}`);
+    }
+
+    if (event.type === 'checkout.session.completed') {
+      console.log(event.data.object);
+      console.log(event.data.object.customer_email);
+      // this.createBooking(event.data.object);
+    }
+
+    return { message: 'received' };
   }
 }

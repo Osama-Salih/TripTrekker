@@ -92,6 +92,10 @@ export class EnvironmentVariables {
   @IsNotEmpty()
   @IsString()
   readonly REDIS_STORE_URL: string;
+
+  @IsNotEmpty()
+  @IsString()
+  readonly WEBHOOK_SECRET: string;
 }
 
 export function validate(config: Record<string, unknown>) {

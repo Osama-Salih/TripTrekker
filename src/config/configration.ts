@@ -18,4 +18,5 @@ export default () => ({
   MAIL_FROM: process.env.MAIL_FROM,
   STRIPE_KEY: process.env.STRIPE_KEY,
   REDIS_STORE_URL: process.env.REDIS_STORE_URL,
+  WEBHOOK_SECRET: process.env.WEBHOOK_SECRET,
 });
