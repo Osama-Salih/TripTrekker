@@ -160,11 +160,6 @@ export class BookingService {
 
     let event;
 
-    this.logger.log('Reading using process....', process.env.WEBHOOK_SECRET);
-    this.logger.log(
-      'Reading using configService....',
-      this.configService.get<string>('WEBHOOK_SECRET'),
-    );
     try {
       event = this.stripe.webhooks.constructEvent(
         req.body,
@@ -175,9 +170,14 @@ export class BookingService {
       throw new BadRequestException(`Webhook Error: ${err.message}`);
     }
 
+    this.logger.warn('Event....', event);
+    this.logger.warn('----------------------------------');
+    this.logger.warn('----------------------------------');
+    this.logger.warn('Event type....', event.type);
     if (event.type === 'checkout.session.completed') {
-      console.log(event.data.object);
-      console.log(event.data.object.customer_email);
+      this.logger.warn('Event object....', event.data.object);
+      this.logger.warn('----------------------------------');
+      this.logger.warn('customer_email....', event.data.object);
       // this.createBooking(event.data.object);
     }
 
