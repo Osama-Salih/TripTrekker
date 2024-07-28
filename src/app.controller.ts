@@ -14,6 +14,6 @@ export class AppController {
 
   @Post('webhook-checkout')
   async checkout(@Req() req: Request) {
-    return this.bookingService.checkout(req);
+    return this.bookingService.handleWebhook(req);
   }
 }

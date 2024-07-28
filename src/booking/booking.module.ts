@@ -9,6 +9,7 @@ import { Booking } from './entities/booking.entity';
 import { Flight } from '../flights/entities/flight.entity';
 import { Hotel } from '../hotels/entities/hotel.entity';
 import { Activity } from '../activities/entities/activity.entity';
+import { UsersModule } from '../users/users.module';
 
 @Module({})
 export class BookingModule {
@@ -20,7 +21,10 @@ export class BookingModule {
     };
     return {
       module: BookingModule,
-      imports: [TypeOrmModule.forFeature([Booking, Flight, Hotel, Activity])],
+      imports: [
+        TypeOrmModule.forFeature([Booking, Flight, Hotel, Activity]),
+        UsersModule,
+      ],
       providers: [stripeProviders, BookingService],
       controllers: [BookingController],
       exports: [stripeProviders, BookingService],

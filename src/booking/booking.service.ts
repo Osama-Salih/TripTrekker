@@ -24,7 +24,7 @@ import {
   BookedServiceType,
 } from './interface/booked-service-interface';
 import { CheckoutSessionDTO } from './dto/checkout-sessioin.dto';
-// import { findOneByEmail } from '../users/users-profile.service';
+import { UserProfileService } from '../users/users-profile.service';
 
 @Injectable()
 export class BookingService {
@@ -43,7 +43,8 @@ export class BookingService {
     private readonly hotelRepo: Repository<Hotel>,
     @InjectRepository(Activity)
     private readonly ActivityRepo: Repository<Activity>,
-    private configService: ConfigService,
+    private readonly userProfileService: UserProfileService,
+    private readonly configService: ConfigService,
   ) {}
 
   private async sessionHelper(
@@ -142,23 +143,23 @@ export class BookingService {
     return { currency, price, cancelUrl };
   }
 
-  // async createBooking(session) {
-  //   const user = await findOneByEmail(session.customer_email);
+  private async createBooking(email: string): Promise<void> {
+    const userPartial: Partial<User> = { email };
+    const user = await this.userProfileService.findOneByEmail(userPartial);
 
-  //   const newBooking = this.bookingRepo.create({
-  //     flight: this.flight,
-  //     hotel: this.hotel,
-  //     activity: this.activity,
-  //     user,
-  //     bookingDate: new Date(),
-  //   });
-  //   //   await this.bookingRepo.save(newBooking);
-  // }
+    const newBooking = this.bookingRepo.create({
+      flight: this.flight,
+      hotel: this.hotel,
+      activity: this.activity,
+      user,
+      bookingDate: new Date(),
+    });
+    await this.bookingRepo.save(newBooking);
+  }
 
-  async checkout(req: Request) {
+  handleWebhook(req: Request): { message: string } {
     const sig = req.headers['stripe-signature'];
-
-    let event;
+    let event: Stripe.Event;
 
     try {
       event = this.stripe.webhooks.constructEvent(
@@ -170,15 +171,10 @@ export class BookingService {
       throw new BadRequestException(`Webhook Error: ${err.message}`);
     }
 
-    this.logger.warn('Event....', event);
-    this.logger.warn('----------------------------------');
-    this.logger.warn('----------------------------------');
-    this.logger.warn('Event type....', event.type);
     if (event.type === 'checkout.session.completed') {
-      this.logger.warn('Event object....', event.data.object);
-      this.logger.warn('----------------------------------');
-      this.logger.warn('customer_email....', event.data.object);
-      // this.createBooking(event.data.object);
+      const session = event.data.object as Stripe.Checkout.Session;
+      const email = session.customer_email;
+      this.createBooking(email);
     }
 
     return { message: 'received' };
