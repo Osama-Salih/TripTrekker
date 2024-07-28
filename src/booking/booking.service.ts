@@ -154,8 +154,7 @@ export class BookingService {
       user,
       bookingDate: new Date(),
     });
-    this.logger.log(newBooking);
-    // await this.bookingRepo.save(newBooking);
+    await this.bookingRepo.save(newBooking);
   }
 
   handleWebhook(req: Request): { message: string } {
