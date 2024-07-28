@@ -158,6 +158,11 @@ export class BookingService {
 
     let event;
 
+    console.log(
+      'Reading using configService....',
+      this.configService.get<string>('WEBHOOK_SECRET'),
+    );
+    console.log('Reading using process....', process.env.WEBHOOK_SECRET);
     try {
       event = this.stripe.webhooks.constructEvent(
         req.body,
