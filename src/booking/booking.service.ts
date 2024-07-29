@@ -168,6 +168,8 @@ export class BookingService {
     const sig = req.headers['stripe-signature'];
     let event: Stripe.Event;
 
+    this.logger.log('Before construct event⚡⚡⚡');
+
     try {
       event = this.stripe.webhooks.constructEvent(
         req.body,
@@ -177,6 +179,7 @@ export class BookingService {
     } catch (err) {
       return { message: `Webhook Error: ${err.message}` };
     }
+    this.logger.log('After construct event⚡⚡⚡');
 
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
