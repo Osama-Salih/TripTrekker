@@ -9,6 +9,7 @@ import Stripe from 'stripe';
 import { STRIPE_CLIENT } from './constants';
 import { Flight } from '../flights/entities/flight.entity';
 import { Hotel } from '../hotels/entities/hotel.entity';
+
 import { Activity } from '../activities/entities/activity.entity';
 import { User } from '../users/entities/user.entity';
 import { Booking } from './entities/booking.entity';
@@ -152,8 +153,20 @@ export class BookingService {
     await this.bookingRepo.save(newBooking);
   }
 
-  async findAll(): Promise<Booking[]> {
-    return this.bookingRepo.find();
+  async findAll(user: User): Promise<Booking[]> {
+    const userRole = user.role;
+    const userId = user.id;
+    const relations = ['user', 'flight', 'hotel', 'activity'];
+    const bookings = await this.bookingRepo.find({ relations });
+    return bookings;
+
+    // if (userRole === 'admin') {
+    //   return this.bookingRepo.find();
+    // } else {
+    //   return this.bookingRepo.find({
+    //     where: { user: { id: userId } },
+    //   });
+    // }
   }
 
   async handleWebhook(req: Request): Promise<{ message: string }> {
