@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe, Logger, LogLevel } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { useContainer } from 'class-validator';
+import * as bodyParser from 'body-parser';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 import helmet from 'helmet';
@@ -28,6 +29,7 @@ async function bootstrap() {
   app.use(helmet()).use(compression()).use(xss());
   app.enableCors({ origin: '*' });
   app.setGlobalPrefix('api/v1');
+  app.use('/webhook-checkout', bodyParser.raw({ type: 'application/json' }));
 
   app.useGlobalPipes(
     new ValidationPipe({
