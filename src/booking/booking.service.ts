@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  Inject,
-  NotFoundException,
-  BadRequestException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 
@@ -144,11 +138,13 @@ export class BookingService {
   }
 
   private async createBooking(email: string): Promise<void> {
+    this.logger.warn(`Email from create booking method: ${email} ⚡⚡⚡`);
+
     const userPartial: Partial<User> = { email };
 
     const user = await this.userProfileService.findOneByEmail(userPartial);
 
-    this.logger.warn(`User: ${JSON.stringify(user)}`);
+    this.logger.warn(`User: ${JSON.stringify(user)} ⚡⚡⚡`);
 
     const newBooking = this.bookingRepo.create({
       flight: this.flight,
@@ -158,7 +154,7 @@ export class BookingService {
       bookingDate: new Date(),
     });
 
-    this.logger.warn(`New Booking: ${JSON.stringify(newBooking)}`);
+    this.logger.warn(`New Booking: ${JSON.stringify(newBooking)} ⚡⚡⚡`);
     await this.bookingRepo.save(newBooking).catch((err) => {
       this.logger.error(`Failed to save booking: ${err.message}`);
     });
@@ -179,14 +175,16 @@ export class BookingService {
         this.configService.get<string>('WEBHOOK_SECRET'),
       );
     } catch (err) {
-      throw new BadRequestException(`Webhook Error: ${err.message}`);
+      return { message: `Webhook Error: ${err.message}` };
     }
 
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
       const email = session.customer_email;
+      this.logger.warn(`Email from hadle webhook method: ${email} ⚡⚡⚡`);
+
       await this.createBooking(email).catch((err) => {
-        this.logger.error(`Failed to create booking: ${err.message}`);
+        this.logger.error(`Failed to create booking: ${err.message} ⚡⚡⚡`);
       });
     }
 
