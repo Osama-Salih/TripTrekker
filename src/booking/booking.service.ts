@@ -166,7 +166,7 @@ export class BookingService {
     return this.bookingRepo.find();
   }
 
-  handleWebhook(req: Request): { message: string } {
+  async handleWebhook(req: Request): Promise<{ message: string }> {
     const sig = req.headers['stripe-signature'];
     let event: Stripe.Event;
 
@@ -183,7 +183,7 @@ export class BookingService {
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
       const email = session.customer_email;
-      this.createBooking(email);
+      await this.createBooking(email);
     }
 
     return { message: 'received' };

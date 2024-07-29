@@ -13,7 +13,7 @@ export class AppController {
   }
 
   @Post('webhook-checkout')
-  async checkout(@Req() req: Request) {
+  async checkout(@Req() req: Request): Promise<{ message: string }> {
     return this.bookingService.handleWebhook(req);
   }
 }
