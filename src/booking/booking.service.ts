@@ -68,8 +68,8 @@ export class BookingService {
         },
       ],
       mode: 'payment',
-      success_url: `${req.protocol}://${req.get('host')}/bookings`,
-      cancel_url: `${req.protocol}://${req.get('host')}/${cancelUrl}`,
+      success_url: `${req.protocol}://${req.get('host')}/api/v1/bookings`,
+      cancel_url: `${req.protocol}://${req.get('host')}/api/v1/${cancelUrl}`,
       customer_email: user.email,
     });
   }
@@ -145,16 +145,21 @@ export class BookingService {
 
   private async createBooking(email: string): Promise<void> {
     const userPartial: Partial<User> = { email };
-    const user = await this.userProfileService.findOneByEmail(userPartial);
 
-    const newBooking = this.bookingRepo.create({
-      flight: this.flight,
-      hotel: this.hotel,
-      activity: this.activity,
-      user,
-      bookingDate: new Date(),
-    });
-    await this.bookingRepo.save(newBooking);
+    try {
+      const user = await this.userProfileService.findOneByEmail(userPartial);
+
+      const newBooking = this.bookingRepo.create({
+        flight: this.flight,
+        hotel: this.hotel,
+        activity: this.activity,
+        user,
+        bookingDate: new Date(),
+      });
+      await this.bookingRepo.save(newBooking);
+    } catch (err) {
+      throw err;
+    }
   }
 
   async findAll(): Promise<Booking[]> {
