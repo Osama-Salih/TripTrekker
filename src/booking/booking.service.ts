@@ -138,13 +138,8 @@ export class BookingService {
   }
 
   private async createBooking(email: string): Promise<void> {
-    this.logger.warn(`Email from create booking method: ${email} ⚡⚡⚡`);
-
     const userPartial: Partial<User> = { email };
-
     const user = await this.userProfileService.findOneByEmail(userPartial);
-
-    this.logger.warn(`User: ${JSON.stringify(user)} ⚡⚡⚡`);
 
     const newBooking = this.bookingRepo.create({
       flight: this.flight,
@@ -154,10 +149,7 @@ export class BookingService {
       bookingDate: new Date(),
     });
 
-    this.logger.warn(`New Booking: ${JSON.stringify(newBooking)} ⚡⚡⚡`);
-    await this.bookingRepo.save(newBooking).catch((err) => {
-      this.logger.error(`Failed to save booking: ${err.message}`);
-    });
+    await this.bookingRepo.save(newBooking);
   }
 
   async findAll(): Promise<Booking[]> {
@@ -168,28 +160,20 @@ export class BookingService {
     const sig = req.headers['stripe-signature'];
     let event: Stripe.Event;
 
-    this.logger.log('Before construct event⚡⚡⚡');
-
     try {
       event = this.stripe.webhooks.constructEvent(
         req.body,
         sig,
         this.configService.get<string>('WEBHOOK_SECRET'),
       );
-      this.logger.warn(`req.body: ${JSON.stringify(req.body)}`);
     } catch (err) {
       return { message: `Webhook Error: ${err.message}` };
     }
-    this.logger.log('After construct event⚡⚡⚡');
 
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
       const email = session.customer_email;
-      this.logger.warn(`Email from hadle webhook method: ${email} ⚡⚡⚡`);
-
-      await this.createBooking(email).catch((err) => {
-        this.logger.error(`Failed to create booking: ${err.message} ⚡⚡⚡`);
-      });
+      await this.createBooking(email);
     }
 
     return { message: 'received' };

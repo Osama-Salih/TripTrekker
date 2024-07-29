@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe, Logger, LogLevel } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { useContainer } from 'class-validator';
 import * as bodyParser from 'body-parser';
@@ -12,12 +12,7 @@ import { rateLimit } from 'express-rate-limit';
 import { xss } from 'express-xss-sanitizer';
 
 async function bootstrap() {
-  const logLevels: LogLevel[] = ['error', 'warn', 'log'];
-  Logger.overrideLogger(logLevels);
-
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    rawBody: true,
-  });
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
