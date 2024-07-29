@@ -146,20 +146,22 @@ export class BookingService {
   private async createBooking(email: string): Promise<void> {
     const userPartial: Partial<User> = { email };
 
-    try {
-      const user = await this.userProfileService.findOneByEmail(userPartial);
+    const user = await this.userProfileService.findOneByEmail(userPartial);
 
-      const newBooking = this.bookingRepo.create({
-        flight: this.flight,
-        hotel: this.hotel,
-        activity: this.activity,
-        user,
-        bookingDate: new Date(),
-      });
-      await this.bookingRepo.save(newBooking);
-    } catch (err) {
-      throw err;
-    }
+    this.logger.warn(`User: ${JSON.stringify(user)}`);
+
+    const newBooking = this.bookingRepo.create({
+      flight: this.flight,
+      hotel: this.hotel,
+      activity: this.activity,
+      user,
+      bookingDate: new Date(),
+    });
+
+    this.logger.warn(`New Booking: ${JSON.stringify(newBooking)}`);
+    await this.bookingRepo.save(newBooking).catch((err) => {
+      this.logger.error(`Failed to save booking: ${err.message}`);
+    });
   }
 
   async findAll(): Promise<Booking[]> {
@@ -183,7 +185,9 @@ export class BookingService {
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
       const email = session.customer_email;
-      await this.createBooking(email);
+      await this.createBooking(email).catch((err) => {
+        this.logger.error(`Failed to create booking: ${err.message}`);
+      });
     }
 
     return { message: 'received' };
