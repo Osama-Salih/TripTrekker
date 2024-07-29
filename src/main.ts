@@ -29,7 +29,10 @@ async function bootstrap() {
   app.use(helmet()).use(compression()).use(xss());
   app.enableCors({ origin: '*' });
   app.setGlobalPrefix('api/v1');
-  app.use('/webhook-checkout', bodyParser.raw({ type: 'application/json' }));
+  app.use(
+    '/api/v1/webhook-checkout',
+    bodyParser.raw({ type: 'application/json' }),
+  );
 
   app.useGlobalPipes(
     new ValidationPipe({

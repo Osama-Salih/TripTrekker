@@ -176,6 +176,7 @@ export class BookingService {
         sig,
         this.configService.get<string>('WEBHOOK_SECRET'),
       );
+      this.logger.warn(`req.body: ${JSON.stringify(req.body)}`);
     } catch (err) {
       return { message: `Webhook Error: ${err.message}` };
     }
