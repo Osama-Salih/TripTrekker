@@ -157,6 +157,10 @@ export class BookingService {
     await this.bookingRepo.save(newBooking);
   }
 
+  async findAll(): Promise<Booking[]> {
+    return this.bookingRepo.find();
+  }
+
   handleWebhook(req: Request): { message: string } {
     const sig = req.headers['stripe-signature'];
     let event: Stripe.Event;

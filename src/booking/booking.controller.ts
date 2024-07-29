@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Get, Req, UseGuards } from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { Request } from 'express';
 
@@ -8,6 +8,7 @@ import { Roles } from '../roles/role.decorator';
 import { RoleEnum } from '../roles/role.enum';
 
 import { CheckoutSessionDTO } from './dto/checkout-sessioin.dto';
+import { Booking } from './entities/booking.entity';
 
 @Controller('bookings')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -21,5 +22,10 @@ export class BookingController {
     @Body() checkoutSessionDTO: CheckoutSessionDTO,
   ) {
     return this.bookingService.checkoutSession(req, checkoutSessionDTO);
+  }
+
+  @Get()
+  async findAll(): Promise<Booking[]> {
+    return this.bookingService.findAll();
   }
 }
