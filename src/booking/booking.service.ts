@@ -1,4 +1,10 @@
-import { Injectable, Inject, NotFoundException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  NotFoundException,
+  Logger,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 
@@ -18,8 +24,10 @@ import {
   BookedService,
   BookedServiceType,
 } from './interface/booked-service-interface';
+import { processedRelations } from './interface/processed-relations-interface';
 import { CheckoutSessionDTO } from './dto/checkout-sessioin.dto';
 import { UserProfileService } from '../users/users-profile.service';
+import { RoleEnum } from 'src/roles/role.enum';
 
 @Injectable()
 export class BookingService {
@@ -153,20 +161,103 @@ export class BookingService {
     await this.bookingRepo.save(newBooking);
   }
 
-  async findAll(user: User): Promise<Booking[]> {
-    const userRole = user.role;
-    const userId = user.id;
-    const relations = ['user', 'flight', 'hotel', 'activity'];
-    const bookings = await this.bookingRepo.find({ relations });
-    return bookings;
+  async findAll(req: Request): Promise<Booking[]> {
+    const { relations, userRole, userId } = await this.processedRelations(req);
 
-    // if (userRole === 'admin') {
-    //   return this.bookingRepo.find();
-    // } else {
-    //   return this.bookingRepo.find({
-    //     where: { user: { id: userId } },
-    //   });
-    // }
+    return userRole === 'admin'
+      ? this.bookingRepo.find({ relations })
+      : this.bookingRepo.find({
+          where: { user: { id: userId } },
+          relations,
+        });
+  }
+
+  async findOne(req: Request): Promise<Booking> {
+    const { id: bookingId } = req.params;
+    const booking = await this.getBookingById(+bookingId);
+
+    const { relations, userRole, userId } = await this.processedRelations(req);
+
+    if (userRole !== 'admin') {
+      if (userId !== booking.user.id) {
+        throw new ForbiddenException(
+          'You are not allowed to access this booking.',
+        );
+      }
+    }
+    return this.bookingRepo.findOne({ where: { id: +bookingId }, relations });
+  }
+
+  private async getAllBookingsWithRelations(
+    relations: string[],
+  ): Promise<Booking[]> {
+    return this.bookingRepo.find({
+      relations,
+    });
+  }
+
+  private async getBookingById(bookingId: number): Promise<Booking> {
+    const booking = await this.bookingRepo.findOneBy({ id: bookingId });
+    if (!booking) {
+      throw new NotFoundException(
+        `There is no booking with this id ${bookingId}`,
+      );
+    }
+    return booking;
+  }
+
+  private async processedRelations(req: Request): Promise<processedRelations> {
+    const user = req.user as User;
+    const { id: bookingId } = req.params;
+    const bookingsRelations = ['user', 'flight', 'activity', 'hotel'];
+    const { role: userRole, id: userId } = user;
+
+    const bookings = !bookingId
+      ? await this.getAllBookingsWithRelations(bookingsRelations)
+      : await this.getBookingById(+bookingId);
+
+    const processedBookings = this.processedBookings(bookings, userRole);
+    const relations = this.filteredRelations(processedBookings, userRole);
+
+    return { relations, userRole, userId };
+  }
+
+  private filteredRelations(bookings: Booking[], userRole: RoleEnum): string[] {
+    const relations =
+      userRole === 'admin'
+        ? ['user', 'flight', 'hotel', 'activity']
+        : ['flight', 'hotel', 'activity'];
+
+    return bookings
+      .map((booking) =>
+        Object.keys(booking).filter((key) => relations.includes(key)),
+      )
+      .flat();
+  }
+
+  private processedBookings(
+    bookings: Booking | Booking[],
+    userRole: RoleEnum,
+  ): Booking[] {
+    const bookingsArray = Array.isArray(bookings) ? bookings : [bookings];
+
+    const processedBookingArray = bookingsArray.map((booking) => {
+      const filteredBooking = Object.entries(booking).reduce(
+        (acc, [key, value]) => {
+          if (value !== null && value !== undefined) {
+            if (userRole === 'admin' && key === 'user') {
+              acc[key] = value.id;
+            } else if (!(userRole === 'user' && key === 'user')) {
+              acc[key] = value;
+            }
+          }
+          return acc;
+        },
+        {} as typeof booking,
+      );
+      return filteredBooking;
+    });
+    return processedBookingArray;
   }
 
   async handleWebhook(req: Request): Promise<{ message: string }> {

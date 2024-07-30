@@ -9,7 +9,6 @@ import { RoleEnum } from '../roles/role.enum';
 
 import { CheckoutSessionDTO } from './dto/checkout-sessioin.dto';
 import { Booking } from './entities/booking.entity';
-import { User } from '../users/entities/user.entity';
 
 @Controller('bookings')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -28,7 +27,12 @@ export class BookingController {
   @Get()
   @Roles(RoleEnum.USER, RoleEnum.ADMIN)
   async findAll(@Req() req: Request): Promise<Booking[]> {
-    const user = req.user as User;
-    return this.bookingService.findAll(user);
+    return this.bookingService.findAll(req);
+  }
+
+  @Get(':id')
+  @Roles(RoleEnum.USER, RoleEnum.ADMIN)
+  async findOne(@Req() req: Request): Promise<Booking> {
+    return this.bookingService.findOne(req);
   }
 }
