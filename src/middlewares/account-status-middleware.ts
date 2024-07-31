@@ -21,7 +21,9 @@ export class AccountStatusMiddleware implements NestMiddleware {
   ) {}
 
   async use(req: Request, _res: Response, next: NextFunction) {
-    if (req.url === '/api/v1/profile/reactive-me') next();
+    if (req.url === '/api/v1/profile/reactive-me') {
+      next();
+    }
 
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer')) {
@@ -40,8 +42,9 @@ export class AccountStatusMiddleware implements NestMiddleware {
       .where(`user.id = :id`, { id })
       .getOne();
 
-    if (!user.isActive)
+    if (!user.isActive) {
       throw new ForbiddenException('Your account is deactivated');
+    }
 
     if (user.passwordChangedAt) {
       const passwordChangedTimestamp = parseInt(
