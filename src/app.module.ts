@@ -1,53 +1,62 @@
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import {
   ClassSerializerInterceptor,
   MiddlewareConsumer,
   Module,
   NestModule,
   RequestMethod,
+  Logger,
 } from '@nestjs/common';
-import { AppController } from './app.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { DataSource } from 'typeorm';
-import { Logger } from '@nestjs/common';
-import { APP_INTERCEPTOR } from '@nestjs/core';
 import { CacheModule } from '@nestjs/cache-manager';
+
+import { DataSource } from 'typeorm';
+import { AppController } from './app.controller';
 
 import { FlightsModule } from './flights/flights.module';
 import { UsersModule } from './users/users.module';
-import { AccountStatusMiddleware } from './middlewares/account-status-middleware';
-
-import { IsPhoneNumberConstraint } from './validators/phone-validator';
-import { IsUniqueConstraint } from './validators/unique-validator';
 import { AuthModule } from './auth/auth.module';
-import { AuthController } from './auth/auth.controller';
-import { UsersController } from './users/users.controller';
-import { UserProfileController } from './users/users-profile.controller';
-import { MailModule } from './mail/mail.module';
 import { HotelsModule } from './hotels/hotels.module';
+
 import { ActivitiesModule } from './activities/activities.module';
 import { BookingModule } from './booking/booking.module';
-import { typeOrmAsyncConfig } from './db/data-source';
+import { MailModule } from './mail/mail.module';
+
+import { UserProfileController } from './users/users-profile.controller';
+import { AuthController } from './auth/auth.controller';
+import { UsersController } from './users/users.controller';
+
+import { IsPhoneNumberConstraint } from './validators/phone-validator';
 import { validate } from './validators/environment';
+import { IsUniqueConstraint } from './validators/unique-validator';
+
+import { typeOrmAsyncConfig } from './db/data-source';
 import configration from './config/configration';
 import redisOptions from './config/redis-options';
+
+import { AccountStatusMiddleware } from './middlewares/account-status-middleware';
 
 @Module({
   imports: [
     CacheModule.registerAsync(redisOptions),
     TypeOrmModule.forRootAsync(typeOrmAsyncConfig),
+
     ConfigModule.forRoot({
       envFilePath: [`${process.cwd()}/.env.${process.env.NODE_ENV}`],
       isGlobal: true,
       load: [configration],
       validate: validate,
     }),
+
     FlightsModule,
     UsersModule,
     AuthModule,
+
     MailModule,
     HotelsModule,
     ActivitiesModule,
+
     BookingModule.ForRoot(process.env.STRIPE_KEY, { apiVersion: '2024-06-20' }),
   ],
   controllers: [AppController],
