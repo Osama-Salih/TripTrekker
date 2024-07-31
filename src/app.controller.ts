@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Req } from '@nestjs/common';
 import { Request } from 'express';
 
-import { BookingService } from './booking/booking.service';
+import { BookingService } from './bookings/bookings.service';
 
 @Controller()
 export class AppController {

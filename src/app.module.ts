@@ -20,7 +20,7 @@ import { AuthModule } from './auth/auth.module';
 import { HotelsModule } from './hotels/hotels.module';
 
 import { ActivitiesModule } from './activities/activities.module';
-import { BookingModule } from './booking/booking.module';
+import { BookingModule } from './bookings/bookings.module';
 import { MailModule } from './mail/mail.module';
 
 import { UserProfileController } from './users/users-profile.controller';

@@ -17,7 +17,7 @@ import { Hotel } from '../hotels/entities/hotel.entity';
 
 import { Activity } from '../activities/entities/activity.entity';
 import { User } from '../users/entities/user.entity';
-import { Booking } from './entities/booking.entity';
+import { Booking } from './entities/bookings.entity';
 
 import {
   BookedService,

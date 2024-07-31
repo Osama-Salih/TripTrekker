@@ -8,7 +8,7 @@ import {
   Param,
   ParseIntPipe,
 } from '@nestjs/common';
-import { BookingService } from './booking.service';
+import { BookingService } from './bookings.service';
 import { Request } from 'express';
 
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -17,7 +17,7 @@ import { Roles } from '../roles/role.decorator';
 import { RoleEnum } from '../roles/role.enum';
 
 import { CheckoutSessionDTO } from './dto/checkout-sessioin.dto';
-import { Booking } from './entities/booking.entity';
+import { Booking } from './entities/bookings.entity';
 
 @Controller('bookings')
 @UseGuards(JwtAuthGuard, RolesGuard)
