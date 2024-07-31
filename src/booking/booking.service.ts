@@ -177,17 +177,23 @@ export class BookingService {
 
   async findOne(req: Request): Promise<Booking> {
     const { id: bookingId } = req.params;
-    const booking = await this.getBookingById(+bookingId);
-    this.logger.warn(`booking form findOne: ${JSON.stringify(booking)}`);
-
     const { relations, userRole, userId } = await this.processedRelations(req);
+    const booking = await this.getBookingById(+bookingId, relations);
+    const {
+      user: { id: bookingUserId },
+    } = booking;
 
-    if (userRole !== 'admin' && userId !== booking.user.id) {
+    if (userRole !== 'admin' && userId !== bookingUserId) {
       throw new ForbiddenException(
         'You are not allowed to access this booking.',
       );
     }
-    return this.bookingRepo.findOne({ where: { id: +bookingId }, relations });
+    const bookingReturn = this.processedBookings(
+      await this.bookingRepo.findOne({ where: { id: +bookingId }, relations }),
+      userRole,
+    )[0];
+
+    return bookingReturn;
   }
 
   private async getAllBookingsWithRelations(
