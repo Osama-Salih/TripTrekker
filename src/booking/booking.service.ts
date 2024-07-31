@@ -177,11 +177,13 @@ export class BookingService {
 
   async findOne(req: Request): Promise<Booking> {
     const { id: bookingId } = req.params;
-    this.logger.warn('booking id', bookingId);
     const booking = await this.getBookingById(+bookingId);
+    this.logger.warn(`booking form findOne: ${JSON.stringify(booking)}`);
+    this.logger.warn(
+      `booking user form findOne: ${JSON.stringify(booking.user)}`,
+    );
 
     const { relations, userRole, userId } = await this.processedRelations(req);
-    this.logger.warn(relations);
 
     if (userRole !== 'admin' && userId !== booking.user.id) {
       throw new ForbiddenException(
@@ -220,7 +222,13 @@ export class BookingService {
       : await this.getBookingById(+bookingId);
 
     const processedBookings = this.processedBookings(bookings, userRole);
+    this.logger.warn(
+      `processed bookings from processed relations method: ${JSON.stringify(processedBookings)}`,
+    );
     const relations = this.filteredRelations(processedBookings, userRole);
+    this.logger.warn(
+      `relations  from processed relations method:  ${relations}`,
+    );
 
     return { relations, userRole, userId };
   }
