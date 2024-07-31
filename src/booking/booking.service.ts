@@ -179,6 +179,7 @@ export class BookingService {
     const { id: bookingId } = req.params;
     const { relations, userRole, userId } = await this.processedRelations(req);
     const booking = await this.getBookingById(+bookingId, relations);
+    this.logger.warn(JSON.stringify(booking));
     const {
       user: { id: bookingUserId },
     } = booking;
