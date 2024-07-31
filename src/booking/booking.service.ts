@@ -2,7 +2,6 @@ import {
   Injectable,
   Inject,
   NotFoundException,
-  Logger,
   ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -34,7 +33,6 @@ export class BookingService {
   private flight: Flight;
   private hotel: Hotel;
   private activity: Activity;
-  private logger: Logger = new Logger(BookingService.name);
   private bookingsRelations: string[] = ['user', 'flight', 'activity', 'hotel'];
 
   constructor(
@@ -183,7 +181,6 @@ export class BookingService {
       +bookingId,
       this.bookingsRelations,
     );
-    this.logger.warn(JSON.stringify(booking));
     const {
       user: { id: bookingUserId },
     } = booking;
