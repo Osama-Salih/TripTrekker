@@ -179,9 +179,6 @@ export class BookingService {
     const { id: bookingId } = req.params;
     const booking = await this.getBookingById(+bookingId);
     this.logger.warn(`booking form findOne: ${JSON.stringify(booking)}`);
-    this.logger.warn(
-      `booking user form findOne: ${JSON.stringify(booking.user)}`,
-    );
 
     const { relations, userRole, userId } = await this.processedRelations(req);
 
@@ -201,8 +198,14 @@ export class BookingService {
     });
   }
 
-  private async getBookingById(bookingId: number): Promise<Booking> {
-    const booking = await this.bookingRepo.findOneBy({ id: bookingId });
+  private async getBookingById(
+    bookingId: number,
+    relations?: string[],
+  ): Promise<Booking> {
+    const booking = await this.bookingRepo.findOne({
+      where: { id: bookingId },
+      relations,
+    });
     if (!booking) {
       throw new NotFoundException(
         `There is no booking with this id ${bookingId}`,
@@ -214,12 +217,12 @@ export class BookingService {
   private async processedRelations(req: Request): Promise<processedRelations> {
     const user = req.user as User;
     const { id: bookingId } = req.params;
-    const bookingsRelations = ['user', 'flight', 'activity', 'hotel'];
+    const bookingsRelations: string[] = ['user', 'flight', 'activity', 'hotel'];
     const { role: userRole, id: userId } = user;
 
     const bookings = !bookingId
       ? await this.getAllBookingsWithRelations(bookingsRelations)
-      : await this.getBookingById(+bookingId);
+      : await this.getBookingById(+bookingId, bookingsRelations);
 
     const processedBookings = this.processedBookings(bookings, userRole);
     this.logger.warn(
