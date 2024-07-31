@@ -22,6 +22,7 @@ import { IsUniqueConstraint } from './validators/unique-validator';
 import { AuthModule } from './auth/auth.module';
 import { AuthController } from './auth/auth.controller';
 import { UsersController } from './users/users.controller';
+import { UserProfileController } from './users/users-profile.controller';
 import { MailModule } from './mail/mail.module';
 import { HotelsModule } from './hotels/hotels.module';
 import { ActivitiesModule } from './activities/activities.module';
@@ -77,6 +78,6 @@ export class AppModule implements NestModule {
         { path: 'auth/verifiy-reset-code', method: RequestMethod.POST },
         { path: 'auth/reset-password', method: RequestMethod.PATCH },
       )
-      .forRoutes(UsersController, AuthController);
+      .forRoutes(UsersController, UserProfileController, AuthController);
   }
 }

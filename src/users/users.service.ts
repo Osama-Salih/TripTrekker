@@ -55,13 +55,14 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDTO: UpdateUserDTO): Promise<User> {
-    const { firstName, lastName, username, email } = updateUserDTO;
+    const { firstName, lastName, username, email, phone } = updateUserDTO;
 
     await this.userRepo.update(id, {
       firstName,
       lastName,
       username,
       email,
+      phone,
     });
 
     return this.findOneByID(id);
