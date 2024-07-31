@@ -35,6 +35,7 @@ export class BookingService {
   private hotel: Hotel;
   private activity: Activity;
   private logger: Logger = new Logger(BookingService.name);
+  private bookingsRelations: string[] = ['user', 'flight', 'activity', 'hotel'];
 
   constructor(
     @Inject(STRIPE_CLIENT) private readonly stripe: Stripe,
@@ -178,7 +179,10 @@ export class BookingService {
   async findOne(req: Request): Promise<Booking> {
     const { id: bookingId } = req.params;
     const { relations, userRole, userId } = await this.processedRelations(req);
-    const booking = await this.getBookingById(+bookingId, relations);
+    const booking = await this.getBookingById(
+      +bookingId,
+      this.bookingsRelations,
+    );
     this.logger.warn(JSON.stringify(booking));
     const {
       user: { id: bookingUserId },
@@ -207,7 +211,7 @@ export class BookingService {
 
   private async getBookingById(
     bookingId: number,
-    relations?: string[],
+    relations: string[],
   ): Promise<Booking> {
     const booking = await this.bookingRepo.findOne({
       where: { id: bookingId },
@@ -224,21 +228,14 @@ export class BookingService {
   private async processedRelations(req: Request): Promise<processedRelations> {
     const user = req.user as User;
     const { id: bookingId } = req.params;
-    const bookingsRelations: string[] = ['user', 'flight', 'activity', 'hotel'];
     const { role: userRole, id: userId } = user;
 
     const bookings = !bookingId
-      ? await this.getAllBookingsWithRelations(bookingsRelations)
-      : await this.getBookingById(+bookingId, bookingsRelations);
+      ? await this.getAllBookingsWithRelations(this.bookingsRelations)
+      : await this.getBookingById(+bookingId, this.bookingsRelations);
 
     const processedBookings = this.processedBookings(bookings, userRole);
-    this.logger.warn(
-      `processed bookings from processed relations method: ${JSON.stringify(processedBookings)}`,
-    );
     const relations = this.filteredRelations(processedBookings, userRole);
-    this.logger.warn(
-      `relations  from processed relations method:  ${relations}`,
-    );
 
     return { relations, userRole, userId };
   }
