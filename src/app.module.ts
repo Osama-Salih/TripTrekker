@@ -80,7 +80,7 @@ export class AppModule implements NestModule {
     consumer
       .apply(AccountStatusMiddleware)
       .exclude(
-        { path: 'users/reactive-me', method: RequestMethod.PATCH },
+        { path: 'profile/reactive-me', method: RequestMethod.PATCH },
         { path: 'auth/login', method: RequestMethod.POST },
         { path: 'auth/signup', method: RequestMethod.POST },
         { path: 'auth/forgot_password', method: RequestMethod.POST },
