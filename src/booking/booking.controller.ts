@@ -1,4 +1,13 @@
-import { Body, Controller, Post, Get, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Get,
+  Req,
+  UseGuards,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { Request } from 'express';
 
@@ -32,7 +41,11 @@ export class BookingController {
 
   @Get(':id')
   @Roles(RoleEnum.USER, RoleEnum.ADMIN)
-  async findOne(@Req() req: Request): Promise<Booking> {
+  async findOne(
+    @Param('id', ParseIntPipe) id: string,
+    @Req() req: Request,
+  ): Promise<Booking> {
+    req.params.id = id;
     return this.bookingService.findOne(req);
   }
 }

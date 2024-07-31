@@ -165,7 +165,10 @@ export class BookingService {
     const { relations, userRole, userId } = await this.processedRelations(req);
 
     return userRole === 'admin'
-      ? this.bookingRepo.find({ relations })
+      ? this.processedBookings(
+          await this.bookingRepo.find({ relations }),
+          userRole,
+        )
       : this.bookingRepo.find({
           where: { user: { id: userId } },
           relations,
@@ -174,16 +177,16 @@ export class BookingService {
 
   async findOne(req: Request): Promise<Booking> {
     const { id: bookingId } = req.params;
+    this.logger.warn('booking id', bookingId);
     const booking = await this.getBookingById(+bookingId);
 
     const { relations, userRole, userId } = await this.processedRelations(req);
+    this.logger.warn(relations);
 
-    if (userRole !== 'admin') {
-      if (userId !== booking.user.id) {
-        throw new ForbiddenException(
-          'You are not allowed to access this booking.',
-        );
-      }
+    if (userRole !== 'admin' && userId !== booking.user.id) {
+      throw new ForbiddenException(
+        'You are not allowed to access this booking.',
+      );
     }
     return this.bookingRepo.findOne({ where: { id: +bookingId }, relations });
   }
